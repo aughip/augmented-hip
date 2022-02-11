@@ -12,7 +12,7 @@
 
 ### Method 1
 
-- Download the zip file from Releases
+- Download the zip file from [Releases](https://github.com/hyblocker/augmented-hip/releases/tag/0.1)
 - Extract it to any folder
 - Press  the **Windows Key** + **R** to open the Run dialog, and paste in `%localappdata%/openvr` then press **Enter** to open the folder in a file explorer.
 - Open the file `openvrpaths.vrpath` with notepad.
@@ -55,7 +55,7 @@ Access the SteamVR folder
 
 Go to the `drivers` folder and create a new folder with whatever name you want. Maybe `augmented-hip`
 
-Copy the files and folders:
+Copy the files and folders from the zip file in [Releases](https://github.com/hyblocker/augmented-hip/releases/tag/0.1):
 ```
 bin
 resources
