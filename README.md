@@ -10,7 +10,11 @@
 
 # Install
 
-### Method 1
+### Method 1: Automatic Install
+
+[Run the installer](https://github.com/hyblocker/aughip-installer-gui/releases/download/0.1/aughip-installer-gui.exe)
+
+### Method 2: Manual Install 1
 
 - Download the zip file from [Releases](https://github.com/hyblocker/augmented-hip/releases/tag/0.1)
 - Extract it to any folder
@@ -45,7 +49,7 @@
 }
 ```
 
-### Method 2
+### Method 3: Manual Install 2
 
 You can also install it into the direct drivers folder.
 
