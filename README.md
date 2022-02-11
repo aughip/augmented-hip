@@ -1,4 +1,4 @@
-[![Augmented Hip](https://github.com/hyblocker/augmented-hip/blob/master/github/banner.png?raw=true)]((https://github.com/hyblocker/augmented-hip/blob/master/github/banner.png?raw=true)
+![Augmented Hip](https://github.com/hyblocker/augmented-hip/blob/master/github/banner.png?raw=true)
 
 >  Augmented Hip, a new hip tracker, which estimates your hip's position and orientation from your feet and head.
 
