@@ -1,0 +1,10 @@
+{
+	"alwaysActivate": true,
+	"name" : "AugmentedHip",
+	"directory" : "",
+	"resourceOnly" : false,
+	"hmd_presence" :
+	[
+		"*.*"
+	]
+}
