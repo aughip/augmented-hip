@@ -180,12 +180,15 @@ void AugmentedHipDevice::RunFrame(vr::TrackedDevicePose_t* poses) {
 
 	int trackedDevicePositionContributorCount = 0;
 
+	Vector3 left_controller;
+
 	// Find the trackers we want to pull off this algorithm
 	for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++) {
 		if (poses[i].bDeviceIsConnected && poses[i].bPoseIsValid) {
 			auto balls = vr::VRProperties()->TrackedDeviceToPropertyContainer(i);
 			auto deviceID = vr::VRProperties()->GetInt32Property(balls, vr::Prop_DeviceClass_Int32);
 			auto ballsHD_RTX = vr::VRProperties()->GetStringProperty(balls, vr::Prop_RegisteredDeviceType_String);
+			auto controllerHandedness = vr::VRProperties()->GetInt32Property(balls, vr::Prop_ControllerRoleHint_Int32);
 
 			switch (deviceID) {
 				case vr::TrackedDeviceClass_GenericTracker:
@@ -221,6 +224,14 @@ void AugmentedHipDevice::RunFrame(vr::TrackedDevicePose_t* poses) {
 					break;
 				case vr::TrackedDeviceClass_Controller:
 					// A controller
+
+					if (controllerHandedness == vr::TrackedControllerRole_LeftHand)
+					{
+						left_controller.x = poses[i].mDeviceToAbsoluteTracking.m[0][3];
+						left_controller.y = poses[i].mDeviceToAbsoluteTracking.m[1][3];
+						left_controller.z = poses[i].mDeviceToAbsoluteTracking.m[2][3];
+					}
+
 					break;
 				case vr::TrackedDeviceClass_HMD:
 
@@ -339,33 +350,20 @@ void AugmentedHipDevice::RunFrame(vr::TrackedDevicePose_t* poses) {
 
 		// rotation
 		
-		// leg directions
 		Vector3 leftLegDir = (trackerPos - left_leg_pos).normalized();
 		Vector3 rightLegDir = (trackerPos - right_leg_pos).normalized();
-
-		// since we dont actually have a spine direction with this IK rig, we have to guess it using the hmd position...
 		Vector3 spineDir = (trackerPos - hmd_pos).normalized();
-		spineDir = final_hip_rot.xform(Vector3(0, 1, 0)).normalized();
-		
-		// hip tracker direction
+		Vector3 hmd_dirVec = (hmd_tracker.xform(Vector3(0, 1, 0))).normalized();
 		Vector3 roughAngle = leftLegDir.cross(rightLegDir).normalized();
-
-		// interpolate between hip and spine
-		roughAngle = (roughAngle * 0.4 + (spineDir * 0.6)).normalized();
-
-		// angle between hip and HMD
-		double dotProd = roughAngle.dot(hmd_tracker.xform(Vector3(0, 0, 1)));
-
-		// flip if we're facing the negative direction to fix the cross product's result
-		if (dotProd < 0) {
-			roughAngle = -(leftLegDir.cross(rightLegDir).normalized());
-
-			// interpolate between hip and spine
-			roughAngle = (roughAngle * 0.4 + (-spineDir * 0.6)).normalized();
-		}
-
+		roughAngle = (roughAngle * 0.4 + (hmd_dirVec * 0.6)).normalized();
 		final_hip_rot = Basis::looking_at(roughAngle, Vector3(0, 1, 0)).get_rotation_quat().normalized();
 		pose.qRotation = quaternion::from_Quat(final_hip_rot);
+
+		Vector3 spineDirFinal = (hmd_pos - trackerPos).normalized();
+
+		pose.vecPosition[0] = trackerPos.x + spineDirFinal.x * 0.2;
+		pose.vecPosition[1] = trackerPos.y + spineDirFinal.y * 0.2;
+		pose.vecPosition[2] = trackerPos.z + spineDirFinal.z * 0.2;
 	}
 
 	// values no one gives a shit about
@@ -394,7 +392,6 @@ const char* AugmentedHipDevice::GetId() const { return GetSerialNumber(); }
 
 void AugmentedHipDevice::AutoCalibHeight() {
 
-	// Average the legs' position, then calculate the distance between them and our hmd to get a good enough guess on player height
 	Vector3 avg_leg_pos = (left_leg_pos + right_leg_pos) * 0.5;
 
 	double guesstimatedHeight = avg_leg_pos.distance_to(hmd_pos);
@@ -402,7 +399,7 @@ void AugmentedHipDevice::AutoCalibHeight() {
 	guesstimatedHeight = CLAMP(guesstimatedHeight, MIN_AUTO_HEIGHT, MAX_AUTO_HEIGHT);
 
 	// THIS IS BAD, as it will make you shorter when you enter a "brace for impact" position
-	// TODO: better algorithm for auto height calib that takes an average over time, maximising for tallest height or something
+	// TODO: better algorithm
 	settings.realPlayerHeight = guesstimatedHeight;
 
 }

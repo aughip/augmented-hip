@@ -32,7 +32,7 @@ vr::EVRInitError DeviceProvider::Init(vr::IVRDriverContext* pDriverContext) {
 
 	VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
 	InitDriverLog(vr::VRDriverLog());
-	DriverLog("Initialising Augmented Hip...");
+	DriverLog("Initialising Augmented Hip 0.2...");
 
 	poses = (vr::TrackedDevicePose_t*)malloc(sizeof(vr::TrackedDevicePose_t) * vr::k_unMaxTrackedDeviceCount);
 	unsigned int id = add_tracker();
